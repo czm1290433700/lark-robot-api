@@ -1,0 +1,14 @@
+{
+  "name": "lark-robot-api",
+  "version": "1.0.0",
+  "description": "基于OpenAI API的飞书机器人一二熊API服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "chenzhenmin",
+  "license": "ISC",
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.26.0"
+  }
+}
