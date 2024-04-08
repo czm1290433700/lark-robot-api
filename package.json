@@ -11,6 +11,7 @@
   "author": "chenzhenmin",
   "license": "ISC",
   "dependencies": {
-    "@larksuiteoapi/node-sdk": "^1.26.0"
+    "@larksuiteoapi/node-sdk": "^1.26.0",
+    "llm-request": "^1.0.0"
   }
 }
