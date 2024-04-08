@@ -2,8 +2,8 @@ const lark = require("@larksuiteoapi/node-sdk");
 const http = require("http");
 
 const client = new lark.Client({
-  appId: "",
-  appSecret: "",
+  appId: process.env.APP_ID,
+  appSecret: process.env.APP_SECRET,
   appType: lark.AppType.SelfBuild,
 });
 
