@@ -4,7 +4,9 @@
   "description": "基于OpenAI API的飞书机器人一二熊API服务",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start:vercel": "npx vercel dev",
+    "deploy": "npx vercel"
   },
   "author": "chenzhenmin",
   "license": "ISC",
