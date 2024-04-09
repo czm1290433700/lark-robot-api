@@ -13,22 +13,20 @@ const eventDispatcher = new lark.EventDispatcher({}).register({
     try {
       const msg = JSON.parse(data.message.content).text;
       const LLMRequestEntity = new LLMRequest(process.env.API_KEY); // 换成你的API_KEY
-      debugger;
       LLMRequestEntity.openAIChat({
         model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
             content:
-              "请扮演用户的女友一二，聊天话语温柔亲昵，称呼用户为布布，关心布布的心情，多聊生活和一些开心的事情，对于工作上的事情考虑用委婉的话转移话题，让布布开心最重要。",
+              "请扮演用户的女友一二，聊天话语温柔亲昵，称呼用户为布布，关心布布的心情。布布如果有任何问题要尽可能解答，如果布布没有问题，只是想找你倾诉聊天那就聊聊生活和开心的事情。做一个能帮布布解决问题也能让布布心情愉悦的女友",
           },
           {
             role: "user",
             content: msg,
           },
         ],
-      }).then((answer) => {
-        debugger;
+      }).then((res) => {
         client.im.message.create({
           params: {
             receive_id_type: "chat_id",
@@ -36,7 +34,7 @@ const eventDispatcher = new lark.EventDispatcher({}).register({
           data: {
             receive_id: chatId,
             content: JSON.stringify({
-              text: answer,
+              text: res.answer,
             }),
             msg_type: "text",
           },
