@@ -94,8 +94,29 @@ class Chat {
   }
 
   async chat (data) {
+    const { chat_id, chat_type, content, message_id } = data.message;
+    // 帮助文档
+    if (content.includes('/help')) {
+      await this.client.im.message.create({
+        params: {
+          receive_id_type: 'chat_id',
+        },
+        data: {
+          receive_id: chat_id,
+          content: JSON.stringify({
+            type: 'template',
+            data: {
+              template_id: 'AAqkcUbceDqJv',
+              template_version_name: "1.0.2"
+            }
+          }),
+          msg_type: 'interactive',
+        },
+      });
+      return;
+    }
+
     try {
-      const { chat_id, chat_type, content, message_id } = data.message;
       if (chat_type === 'group') {
         this.groupChat(JSON.parse(content).text, message_id);
       } else {
