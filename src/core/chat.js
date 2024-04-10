@@ -12,7 +12,7 @@ class Chat {
     });
   }
 
-  async chat (chatId) {
+  async p2pChat (chatId) {
     try {
       const res = await this.client.im.message.list({
         params: {
@@ -58,6 +58,51 @@ class Chat {
         },
       });
     } catch (err) {
+    }
+  }
+
+  async groupChat (msg, msgId) {
+    try {
+      const LLMRequestEntity = new LLMRequest(process.env.API_KEY);
+      const chatRes = await LLMRequestEntity.openAIChat({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content:
+              '请扮演用户的女友一二，聊天话语温柔亲昵，称呼用户为布布。解答布布的问题，并且让布布开心。',
+          },
+          {
+            role: "user",
+            content: msg.split(' ')?.[1] || msg
+          }
+        ],
+      });
+      await this.client.im.message.reply({
+        path: {
+          message_id: msgId
+        },
+        data: {
+          content: JSON.stringify({
+            text: chatRes.answer
+          }),
+          msg_type: 'text'
+        },
+      });
+    } catch (err) {
+    }
+  }
+
+  async chat (data) {
+    try {
+      const { chat_id, chat_type, content, message_id } = data.message;
+      if (chat_type === 'group') {
+        this.groupChat(JSON.parse(content).text, message_id);
+      } else {
+        this.p2pChat(chat_id);
+      }
+    } catch (err) {
+
     }
   }
 }
