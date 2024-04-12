@@ -1,5 +1,6 @@
 const LLMRequest = require('llm-request').default;
 const lark = require("@larksuiteoapi/node-sdk");
+const Document = require('./document');
 
 class Chat {
   client;
@@ -95,30 +96,37 @@ class Chat {
 
   async chat (data) {
     const { chat_id, chat_type, content, message_id } = data.message;
-    // 帮助文档
-    if (content.includes('/help')) {
-      await this.client.im.message.create({
-        params: {
-          receive_id_type: 'chat_id',
-        },
-        data: {
-          receive_id: chat_id,
-          content: JSON.stringify({
-            type: 'template',
-            data: {
-              template_id: 'AAqkcUbceDqJv',
-              template_version_name: "1.0.2"
-            }
-          }),
-          msg_type: 'interactive',
-        },
-      });
-      return;
-    }
-
     try {
+      const text = JSON.parse(content).text;
+
+      if (text.includes('/help')) {
+        // 帮助文档
+        await this.client.im.message.create({
+          params: {
+            receive_id_type: 'chat_id',
+          },
+          data: {
+            receive_id: chat_id,
+            content: JSON.stringify({
+              type: 'template',
+              data: {
+                template_id: 'AAqkcUbceDqJv',
+                template_version_name: "1.0.2"
+              }
+            }),
+            msg_type: 'interactive',
+          },
+        });
+        return;
+      } else if (text.includes('/summary-document')) {
+        // 总结文档
+        const documentEntity = new Document(this.client, text.split(' ')[1], chat_id);
+        await documentEntity.summary();
+        return;
+      }
+
       if (chat_type === 'group') {
-        this.groupChat(JSON.parse(content).text, message_id);
+        this.groupChat(text, message_id);
       } else {
         this.p2pChat(chat_id);
       }
