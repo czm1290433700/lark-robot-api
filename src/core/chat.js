@@ -1,6 +1,7 @@
 const LLMRequest = require("llm-request").default;
 const lark = require("@larksuiteoapi/node-sdk");
 const Document = require("./document");
+const Message = require("./message");
 
 class Chat {
   client;
@@ -13,7 +14,7 @@ class Chat {
     });
   }
 
-  async p2pChat(chatId) {
+  async p2pChat (chatId) {
     try {
       const res = await this.client.im.message.list({
         params: {
@@ -58,10 +59,10 @@ class Chat {
           msg_type: "text",
         },
       });
-    } catch (err) {}
+    } catch (err) { }
   }
 
-  async groupChat(msg, msgId) {
+  async groupChat (msg, msgId) {
     try {
       const LLMRequestEntity = new LLMRequest(process.env.API_KEY);
       const chatRes = await LLMRequestEntity.openAIChat({
@@ -89,11 +90,11 @@ class Chat {
           msg_type: "text",
         },
       });
-    } catch (err) {}
+    } catch (err) { }
   }
 
-  async chat(data) {
-    const { chat_id, chat_type, content, message_id } = data.message;
+  async chat (data) {
+    const { chat_id, chat_type, content, message_id, mentions } = data.message;
     try {
       const text = JSON.parse(content).text;
 
@@ -109,7 +110,7 @@ class Chat {
               type: "template",
               data: {
                 template_id: "AAqkcUbceDqJv",
-                template_version_name: "1.0.2",
+                template_version_name: "1.0.3",
               },
             }),
             msg_type: "interactive",
@@ -125,6 +126,12 @@ class Chat {
         );
         await documentEntity.summary();
         return;
+      } else if (text.includes("/send-msg-to-user")) {
+        // 给指定人发送消息通知
+        const users = mentions.map((item) => item.id.open_id);
+        const messageEntity = new Message(this.client);
+        await messageEntity.sendMessageToUsers(users, text.split(' ').pop());
+        return;
       }
 
       if (chat_type === "group") {
@@ -132,7 +139,7 @@ class Chat {
       } else {
         this.p2pChat(chat_id);
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 }
 
