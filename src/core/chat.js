@@ -2,6 +2,7 @@ const LLMRequest = require("llm-request").default;
 const lark = require("@larksuiteoapi/node-sdk");
 const Document = require("./document");
 const Message = require("./message");
+const Group = require("./group");
 
 class Chat {
   client;
@@ -110,7 +111,7 @@ class Chat {
               type: "template",
               data: {
                 template_id: "AAqkcUbceDqJv",
-                template_version_name: "1.0.4",
+                template_version_name: "1.0.5",
               },
             }),
             msg_type: "interactive",
@@ -143,6 +144,18 @@ class Chat {
         const [_, chatIds, request] = text.split(' ');
         const messageEntity = new Message(this.client);
         await messageEntity.sendMessageToGroupById(chatIds.split(','), request);
+        return;
+      } else if (text.includes("/create-group-by-text")) {
+        // 自动拉群，使用文案要求发送拉群用意
+        const [_, groupName, __, request] = text.split(' ');
+        const groupEntity = new Group(this.client);
+        await groupEntity.createGroup(groupName, data.sender.sender_id.open_id, mentions.map((item) => item.id.open_id), request, false);
+        return;
+      } else if (text.includes("/create-group-by-document")) {
+        // 自动拉群，使用文档发送拉群用意
+        const [_, groupName, __, documentUrl] = text.split(' ');
+        const groupEntity = new Group(this.client);
+        await groupEntity.createGroup(groupName, data.sender.sender_id.open_id, mentions.map((item) => item.id.open_id), documentUrl, true);
         return;
       }
 
