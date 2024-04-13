@@ -110,7 +110,7 @@ class Chat {
               type: "template",
               data: {
                 template_id: "AAqkcUbceDqJv",
-                template_version_name: "1.0.3",
+                template_version_name: "1.0.4",
               },
             }),
             msg_type: "interactive",
@@ -131,6 +131,18 @@ class Chat {
         const users = mentions.map((item) => item.id.open_id);
         const messageEntity = new Message(this.client);
         await messageEntity.sendMessageToUsers(users, text.split(' ').pop());
+        return;
+      } else if (text.includes("/send-msg-to-group") && !text.includes("/send-msg-to-group-by-id")) {
+        // 通过群名给指定群组发消息
+        const [_, chatName, request] = text.split(' ');
+        const messageEntity = new Message(this.client);
+        await messageEntity.sendMessageToGroup(chatName, request, chat_id);
+        return;
+      } else if (text.includes("/send-msg-to-group-by-id")) {
+        // 通过群id给指定群组发消息
+        const [_, chatIds, request] = text.split(' ');
+        const messageEntity = new Message(this.client);
+        await messageEntity.sendMessageToGroupById(chatIds.split(','), request);
         return;
       }
 
