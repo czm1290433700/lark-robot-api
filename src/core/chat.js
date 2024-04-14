@@ -3,6 +3,7 @@ const lark = require("@larksuiteoapi/node-sdk");
 const Document = require("./document");
 const Message = require("./message");
 const Group = require("./group");
+const Task = require("./task");
 
 class Chat {
   client;
@@ -156,6 +157,24 @@ class Chat {
         const [_, groupName, __, documentUrl] = text.split(' ');
         const groupEntity = new Group(this.client);
         await groupEntity.createGroup(groupName, data.sender.sender_id.open_id, mentions.map((item) => item.id.open_id), documentUrl, true);
+        return;
+      } else if (text.includes("/create-task-by-text")) {
+        // 使用文案创建任务
+        const [_, taskName, taskText, assignee, __, time] = text.split(' ');
+        const assigneeLength = assignee.split('@').length - 1;
+        const assigneeIds = mentions.map((item) => item.id.open_id).slice(0, assigneeLength);
+        const followerIds = mentions.map((item) => item.id.open_id).slice(assigneeLength);
+        const taskEntity = new Task(this.client);
+        await taskEntity.createTask(taskName, taskText, time, assigneeIds, followerIds, false);
+        return;
+      } else if (text.includes("/create-task-by-document")) {
+        // 使用文档创建任务
+        const [_, taskName, taskText, assignee, __, time] = text.split(' ');
+        const assigneeLength = assignee.split('@').length - 1;
+        const assigneeIds = mentions.map((item) => item.id.open_id).slice(0, assigneeLength);
+        const followerIds = mentions.map((item) => item.id.open_id).slice(assigneeLength);
+        const taskEntity = new Task(this.client);
+        await taskEntity.createTask(taskName, taskText, time, assigneeIds, followerIds, true);
         return;
       }
 
